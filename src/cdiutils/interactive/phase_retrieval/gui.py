@@ -119,6 +119,9 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
             detwin: Checkbox to enable or disable detwinning.
             calc_llk: Input field to specify the interval for log-likelihood
                 calculations.
+            tv_er: Smoothing/TV regularisation parameter during ER cycles.
+            tv_hio: Smoothing/TV regularisation parameter during HIO cycles.
+            tv_raar: Smoothing/TV regularisation parameter during RAAR cycles.
             zero_mask: Dropdown to specify whether to force mask pixels to zero.
         """
 
@@ -203,6 +206,9 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 detwin: Checkbox to enable or disable detwinning.
                 calc_llk: Input field to specify the interval for log-likelihood
                     calculations.
+                tv_er: Smoothing/TV regularisation parameter during ER cycles.
+                tv_hio: Smoothing/TV regularisation parameter during HIO cycles.
+                tv_raar: Smoothing/TV regularisation parameter during RAAR cycles.
                 zero_mask: Dropdown to specify whether to force mask pixels to
                     zero.
                 mask_interp: Input field to specify interpolation parameters for
@@ -213,7 +219,6 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                     (e.g., modes decomposition, filtering).
                 filter_criteria: Dropdown to select the criteria for filtering
                     reconstruction results.
-
             Notes:
                 - The method also assigns event handlers to widgets to
                 dynamically update the GUI based on user interactions.
@@ -615,6 +620,42 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 readout=True,
                 style={"description_width": "initial"},
             )
+            
+            self.tv_er = widgets.FloatText(
+                value=0.15,
+                step=0.01,
+                max=0,
+                min=0.2,
+                continuous_update=False,
+                description="TV parameter for ER:",
+                layout=widgets.Layout(width="35%", height="50px"),
+                readout=True,
+                style={"description_width": "initial"},
+            )
+            
+            self.tv_hio = widgets.FloatText(
+                value=0.15,
+                step=0.01,
+                max=0,
+                min=0.2,
+                continuous_update=False,
+                description="TV parameter for ER:",
+                layout=widgets.Layout(width="35%", height="50px"),
+                readout=True,
+                style={"description_width": "initial"},
+            )
+            
+            self.tv_raar = widgets.FloatText(
+                value=0.15,
+                step=0.01,
+                max=0,
+                min=0.2,
+                continuous_update=False,
+                description="TV parameter for ER:",
+                layout=widgets.Layout(width="35%", height="50px"),
+                readout=True,
+                style={"description_width": "initial"},
+            )
 
             self.unused_label_mask_options = widgets.HTML(
                 value="<p style='font-weight: bold;font-size:1.2em'>\
@@ -854,6 +895,9 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                         self.beta,
                         self.detwin,
                         self.calc_llk,
+                        self.tv_er,
+                        self.tv_hio,
+                        self.tv_raar,
                     ]
                 ),
                 self.unused_label_mask_options,
@@ -1108,6 +1152,9 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 beta=self.beta,
                 detwin=self.detwin,
                 calc_llk=self.calc_llk,
+                tv_er=self.tv_er,
+                tv_hio=self.tv_hio,
+                tv_raar=self.tv_raar,
                 zero_mask=self.zero_mask,
                 mask_interp=self.mask_interp,
                 run_phase_retrieval=self.run_phase_retrieval,
@@ -1162,6 +1209,9 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
             beta,
             detwin,
             calc_llk,
+            tv_er,
+            tv_hio,
+            tv_raar,
             zero_mask,
             mask_interp,
             run_phase_retrieval,
@@ -1312,6 +1362,9 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 "beta": beta,
                 "detwin": detwin,
                 "calc_llk": calc_llk,
+                "tv_er": tv_er,
+                "tv_hio": tv_hio,
+                "tv_raar": tv_raar,
                 "support_threshold": literal_eval(support_threshold),
                 "support_autocorrelation_threshold": literal_eval(
                     support_autocorrelation_threshold
@@ -1467,6 +1520,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             plot_axis=params["plot_axis"],
                                             positivity=params["positivity"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_hio"],
                                         )
                                         ** params["nb_hio"]
                                         * cdi
@@ -1479,6 +1533,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             plot_axis=params["plot_axis"],
                                             positivity=params["positivity"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_raar"],
                                         )
                                         ** (params["nb_raar"] // 2)
                                         * cdi
@@ -1516,6 +1571,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             positivity=params["positivity"],
                                             psf_filter=params["psf_filter"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_raar"],
                                         )
                                         ** (nb_raar // 2)
                                         * cdi
@@ -1529,6 +1585,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             positivity=params["positivity"],
                                             psf_filter=params["psf_filter"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_er"],
                                         )
                                         ** nb_er
                                         * cdi
@@ -1557,6 +1614,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             positivity=params["positivity"],
                                             psf_filter=params["psf_filter"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_hio"],
                                         )
                                         ** params["support_update_period"]
                                     ) ** hio_power * cdi
@@ -1570,6 +1628,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             positivity=params["positivity"],
                                             psf_filter=params["psf_filter"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_raar"],
                                         )
                                         ** params["support_update_period"]
                                     ) ** raar_power * cdi
@@ -1607,6 +1666,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             positivity=params["positivity"],
                                             psf_filter=params["psf_filter"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_raar"],
                                         )
                                         ** params["support_update_period"]
                                     ) ** raar_power * cdi
@@ -1620,6 +1680,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             positivity=params["positivity"],
                                             psf_filter=params["psf_filter"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_er"],
                                         )
                                         ** params["support_update_period"]
                                     ) ** er_power * cdi
@@ -1634,6 +1695,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             plot_axis=params["plot_axis"],
                                             positivity=params["positivity"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_hio"],
                                         )
                                         ** params["nb_hio"]
                                         * cdi
@@ -1646,6 +1708,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             plot_axis=params["plot_axis"],
                                             positivity=params["positivity"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_raar"],
                                         )
                                         ** params["nb_raar"]
                                         * cdi
@@ -1657,6 +1720,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             plot_axis=params["plot_axis"],
                                             positivity=params["positivity"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_er"],
                                         )
                                         ** params["nb_er"]
                                         * cdi
@@ -1685,6 +1749,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             plot_axis=params["plot_axis"],
                                             positivity=params["positivity"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_hio"],
                                         )
                                         ** params["support_update_period"]
                                     ) ** hio_power * cdi
@@ -1697,6 +1762,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             plot_axis=params["plot_axis"],
                                             positivity=params["positivity"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_raar"],
                                         )
                                         ** params["support_update_period"]
                                     ) ** raar_power * cdi
@@ -1708,6 +1774,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                                             plot_axis=params["plot_axis"],
                                             positivity=params["positivity"],
                                             zero_mask=params["zero_mask"],
+                                            tv=params["tv_er"],
                                         )
                                         ** params["support_update_period"]
                                     ) ** er_power * cdi
