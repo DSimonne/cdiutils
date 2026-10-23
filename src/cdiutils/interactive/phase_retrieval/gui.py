@@ -620,7 +620,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 readout=True,
                 style={"description_width": "initial"},
             )
-            
+
             self.tv_er = widgets.FloatText(
                 value=0.15,
                 step=0.01,
@@ -632,7 +632,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 readout=True,
                 style={"description_width": "initial"},
             )
-            
+
             self.tv_hio = widgets.FloatText(
                 value=0.15,
                 step=0.01,
@@ -644,7 +644,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 readout=True,
                 style={"description_width": "initial"},
             )
-            
+
             self.tv_raar = widgets.FloatText(
                 value=0.15,
                 step=0.01,
