@@ -37,6 +37,7 @@ try:
         RAAR,
         AutoCorrelationSupport,
         InitFreePixels,
+        InitObjRandom,
         InitPSF,
         InterpIobsMask,
         ScaleObj,
@@ -1487,32 +1488,42 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                         # support given
                         if not support:
                             params["sup_init"] = "autocorrelation"
-                            if not params["live_plot"]:
-                                cdi = (
-                                    ScaleObj()
-                                    * AutoCorrelationSupport(
-                                        threshold=params[
-                                            "support_autocorrelation_threshold"
-                                        ],
-                                        verbose=True,
-                                    )
-                                    * cdi
+                            cdi = (
+                                AutoCorrelationSupport(
+                                    threshold=params[
+                                        "support_autocorrelation_threshold"
+                                    ],
+                                    verbose=True,
                                 )
-
-                            else:
-                                cdi = (
-                                    ShowCDI(plot_axis=params["plot_axis"])
-                                    * ScaleObj()
-                                    * AutoCorrelationSupport(
-                                        threshold=params[
-                                            "support_autocorrelation_threshold"
-                                        ],
-                                        verbose=True,
-                                    )
-                                    * cdi
-                                )
+                                * cdi
+                            )
                         else:
                             params["sup_init"] = "support"
+
+                        # Start each run from a random object, if no
+                        # object given
+                        if not obj:
+                            cdi = (
+                                InitObjRandom(
+                                    src="support",
+                                    amin=0,
+                                    amax=1,
+                                    phirange=(
+                                        0
+                                        if params["positivity"]
+                                        else 2 * np.pi
+                                    ),
+                                )
+                                * cdi
+                            )
+
+                        if not support or not obj:
+                            cdi = ScaleObj() * cdi
+                            if params["live_plot"]:
+                                cdi = (
+                                    ShowCDI(plot_axis=params["plot_axis"])
+                                    * cdi
+                                )
 
                         # Begin phase retrieval
                         try:
