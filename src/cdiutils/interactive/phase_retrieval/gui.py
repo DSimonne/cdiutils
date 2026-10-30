@@ -278,8 +278,7 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 + [
                     os.path.basename(f)
                     for f in sorted(
-                        glob.glob(work_dir + "*.cxi") + glob.glob(os.path.join(work_dir, "*.npz")),
-                        key=os.path.getmtime
+                        glob.glob(work_dir + "*.npz"), key=os.path.getmtime
                     )
                 ],
                 description="Dataset",
@@ -319,7 +318,10 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
                 + [
                     os.path.basename(f)
                     for f in sorted(
-                        glob.glob(work_dir + "*.npz"), key=os.path.getmtime
+                        glob.glob(work_dir + "*.cxi")
+                        + glob.glob(work_dir + "*.npz")
+                        + glob.glob(work_dir + "*.npy"),
+                        key=os.path.getmtime,
                     )
                 ],
                 value="",
@@ -983,7 +985,10 @@ if IS_INTERACTIVE_AVAILABLE and IS_PYNX_AVAILABLE:
             self.obj.options = [""] + [
                 os.path.basename(f)
                 for f in sorted(
-                    glob.glob(change + "/*.npz"), key=os.path.getmtime
+                    glob.glob(change + "/*.cxi")
+                    + glob.glob(change + "/*.npz")
+                    + glob.glob(change + "/*.npy"),
+                    key=os.path.getmtime,
                 )
             ]
 
